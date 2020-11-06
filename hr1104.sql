@@ -106,3 +106,87 @@ where job_id in('AD_PRES','PU_CLERK');
 select employee_id,first_name||last_name,first_name||':'||last_name,department_id, job_id
 from employees
 where job_id in('AD_PRES','PU_CLERK');
+
+-- ppt 연습문제 
+-- 부서 80의 각 사원에 대해 적용 가능한 세율 표시
+SELECT last_name,salary,
+       CASE 
+            WHEN salary < 2000 THEN 0
+            WHEN (salary < 4000) THEN 0.09
+            WHEN (salary < 6000) THEN 0.2
+            WHEN (salary < 8000) THEN 0.3
+            WHEN (salary < 10000) THEN 0.4
+            WHEN (salary < 12000) THEN 0.42
+            WHEN (salary < 14000) THEN 0.44
+            ELSE 0.45
+        END AS TAX_RATE
+FROM employees WHERE department_id=80;
+
+
+SELECT last_name,salary,
+       DECODE(TRUNC(salary/2000,0),
+                    0,0.00,
+                    1,0.09,
+                    2,0.20,
+                    3,0.30,
+                    4,0.40,
+                    5,0.42,
+                    6,0.44,
+                    0.45) AS TAX_RATE
+FROM employees WHERE department_id=80;
+
+--다중행 함수 연습
+--회사 내의 최대 연봉 및 최소 연봉 차이를 조회
+
+select max(salary)-min(salary)
+from employees;
+
+
+--매니저로 근무하는 사원들의 인원수 조회
+
+select count(distinct MANAGER_ID) as 매니저 from employees;
+
+--부서별 직원의 수를 구하여 부서번호의 오름차순으로 출력
+select count(employee_id),department_id
+from employees 
+group by department_id order by department_id;
+
+--부서별 급여의 평균 연봉을 출력하고, 평균연봉은 정수만 나오도록 한다
+--부서번호별 오름차순으로 정렬
+select employee_id,round(avg(salary),0),department_id
+from employees
+group by employee_id,department_id order by department_id;
+
+--동일한 직업을 가진 사원수를 조회
+
+select job_id, count(employee_id)
+from employees
+group by job_id;
+
+
+-- JOIN 실습 
+--자신의 담당 매니저의 고용일보다 빠른 입사자를 찾아 HIRE_DATE, LAST_NAME,
+--MANAGER_ID를 출력하시오 (EMPLOYEES SELF JOIN)
+SELECT E1.HIRE_DATE,E1.LAST_NAME,E1.HIRE_DATE AS 내입사일, E1.MANAGER_ID ,E2.HIRE_DATE AS 매니저입사일
+FROM EMPLOYEES E1, EMPLOYEES E2
+WHERE E1.MANAGER_ID = E2.EMPLOYEE_ID AND E1.HIRE_DATE < E2.HIRE_DATE;
+
+
+--도시 이름이 T로 시작하는 지역에 사는 사원들의 사번, LAST_NAME, 부서번호 조회
+--조회(EMPLOYEES 와 DEPARTMENT_ID와 DEPARTMENTS의 DEPARTMENT_ID 연결후
+--DEPARTMENTS의 LOCATION_ID 와 LOCATIONS의 LOCATION_ID 조인)
+
+
+--위치 ID가 1700인 동일한 사원들의 LAST_NAME, DEPARTMENT_ID, SALARY 조회
+--조회(EMPLOYEES와 DEPARTMENTS 조인)
+
+
+--DEPARTMENT_NAME, LOCATION_ID, 각 부서별 사원수, 각 부서별 평균 연봉 조회
+-- (EMPLOYEES, DEPARTMENT 조인)
+
+-- 기존의 직업을 여전히 가지고 있는 사원들의 사번 및 JOB_ID 조회
+-- (EMPLOYEES, JOB_HISTORY 조인)
+
+-- 각 사원별 소속 부서에서 자신보다 늦게 고용되었으나 보다 많은 연봉을 받는
+-- 사원이 존재하는 모든 사원들의 LAST_NAME을 조회
+-- (EMPLOYEES SELF JOIN)

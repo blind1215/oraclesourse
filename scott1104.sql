@@ -373,3 +373,120 @@ SELECT empno,ename,job,sal,case
                             WHEN COMM>0 THEN '수당 : ' || COMM
                            END AS COMM_TEXT FROM EMP;
  
+ /*
+    ppt 함수 연습문제
+*/
+DESC emp;
+
+-- 월평균 근무일수는 21.5 일, DAY_PAY(하루급여) : SAL / 21.5, 
+-- TIME_PAY(시급) : SAL/21.5/8
+
+SELECT empno,ename,sal,ROUND((sal/21.5),2) as day_pay, 
+       ROUND((sal/21.5/8),1) as time_pay
+FROM emp;
+
+-- 정직원 기준 : HIREDATE + 3 개월이 지난 첫 월요일
+
+SELECT empno,ename,hiredate,NEXT_DAY(ADD_MONTHS(hiredate,3),'월요일') as R_JOB, 
+       NVL(TO_CHAR(comm),'N/A') AS COMM
+FROM emp;
+
+-- EMP 테이블의 직속상관 사원번호
+
+SELECT SUBSTR(TO_CHAR(mgr),1,2) FROM EMP;
+
+
+SELECT empno,ename,mgr,
+       DECODE(SUBSTR(TO_CHAR(mgr),1,2),
+            null, '0000',
+            '75', '5555',
+            '76', '6666',
+            '77', '7777',
+            '78', '8888',
+            TO_CHAR(mgr)) AS CHG_MGR
+FROM emp;
+
+--ppt실습 1
+select deptno,trunc(avg(sal),0) as avg_asl ,max(sal)as max_sal,min(sal) as min_sal,count(deptno)
+from emp
+group by deptno;
+
+--선생님꺼
+select deptno,floor(avg(sal)) as avg_asl, max(sal)as max_sal,min(sal) as min_sal,count(empno) as cnt
+from emp
+group by deptno;
+
+--실습2
+
+select job,count(job) 
+from emp
+group by job
+having count(job)>=3;
+
+--실습3
+select to_char(hiredate,'yyyy'),deptno,count(*) as cnt
+from emp
+group by to_char(hiredate,'yyyy'),deptno
+order by to_char(hiredate,'yyyy') desc;
+
+--join 중요함 !!!!!!!!!!
+-- 조인
+select*from emp,dept order by empno;
+select count(*) from emp,dept order by empno; --56개행나옴 (14*4)
+--나올수 있는 모든 조합 조회
+--너무많기때문에 원하는걸 추출하는 작업을 할때 불편함
+select*from dept; --4행
+select*from emp;  --14행
+
+--1) 내부조인(등가조인)
+select*
+from emp,dept
+where emp.deptno = dept.deptno --조인기준
+order by empno;
+
+select*
+from emp e,dept d
+where e.deptno = d.deptno --조인기준
+order by empno;
+
+select*
+from emp inner join dept
+on emp.deptno = dept.deptno --조인기준
+order by empno;
+
+select*
+from emp e inner join dept d
+on e.deptno = d.deptno --조인기준
+order by empno;
+
+--두 테이블에 같은 이름의 필드가 존재하는 경우
+--어느테이블에 있는 필드를 가지고 올 것인지 정확히 명시
+select empno,ename,job, b.deptno,dname
+from emp e,dept d
+where e.deptno = d.deptno --조인기준
+order by empno;
+
+--dmp 테이블과 dept 데이터를 조인하여 enpno,ename,sal, deptno
+--dname, loc 를 조회한다 단,급여가 3000 이상인 사원만 출력
+select e.empno, e.ename, e.sal, d.deptno,d.dname,d.loc
+from emp e, dept d
+where e.deptno = d.deptno and sal>=3000;
+
+--emp 테이블의 별칭을 e로, dept 테이블 별칭을 d로 하여
+--급여가 2500이하이고, 사원번호가 9999 이하인 사원의 정보를 출력
+select * 
+from emp e, dept d 
+where e.deptno = d.deptno and sal<=2500 and empno<=9999;
+
+
+-- emp 테이블의 별칭을 e로, salgrade 테이블 별칭을 s로 하여
+--각 사원의 정보와 더불어 사원의 등급 정보를 출력
+
+select*from salgrade;
+
+select*
+from emp e, salgrade s
+where e.sal between s.losal and s.hisal;
+--둘의 같은 이름이 없기때문에 sal의 값을 losal과 hisal의 사이에있는 숫자로 조인기준으로 넣음
+
+

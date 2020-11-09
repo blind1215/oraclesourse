@@ -489,4 +489,10 @@ from emp e, salgrade s
 where e.sal between s.losal and s.hisal;
 --둘의 같은 이름이 없기때문에 sal의 값을 losal과 hisal의 사이에있는 숫자로 조인기준으로 넣음
 
+--PPT23 실습1
+SELECT
+FROM EMP E, DEPT D
+WHERE JOB
+
+
 
